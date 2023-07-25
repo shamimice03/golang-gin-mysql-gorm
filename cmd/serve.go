@@ -1,11 +1,11 @@
 package cmd
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/shamimice03/golang-gin-mysql-gorm/pkg/config"
+	"github.com/shamimice03/golang-gin-mysql-gorm/pkg/routing"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -26,16 +26,15 @@ var serveCmd = &cobra.Command{
 func serve() {
 
 	config.Set()
+	routing.Init()
+	router := routing.GetRouter()
 
-	configs := config.Get()
-
-	r := gin.Default()
-	r.GET("/ping", func(c *gin.Context) {
+	router.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message":  "pong",
 			"app name": viper.Get("App.Name"),
 		})
 	})
 
-	r.Run(fmt.Sprintf("%s:%s", configs.Server.Host, configs.Server.Port))
+	routing.Serve()
 }
